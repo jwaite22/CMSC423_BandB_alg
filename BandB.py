@@ -51,17 +51,27 @@ def consistent(cyclo, spectrum):
     return True
 
 def Cyclospectrum(peptide):
-    final = []
-    plst = peptide + peptide
-    for i, A in enumerate(peptide):
-        for j in range(i,i+len(peptide)):
-            mass = 0
-            for x in range(i,j+1):
-                mass += plst[x]
-            final.append(mass)
-    final.sort()
-    final = final[:(-len(peptide)+1)]
-    return final
+    cyclo=peptide[:]
+    length = len(peptide)
+    if length > 2:
+        cyclo.append(peptide[0] + peptide[length-1])
+        for i in range(len(peptide)):
+            pep = peptide[i]
+            j= i+1
+            while j < length:
+                pep += peptide[j]
+                cyclo.append(pep)
+                j+=1
+            if i > 0 and i < length-1 and length > 0:
+                cyclo.append(peptide[0] + peptide[length-1]+peptide[i])
+    else:
+        if length == 1:
+            return peptide
+        else :
+            return (peptide + [peptide[1] + peptide[0]])
+    cyclo.sort()
+    return cyclo
+
 
 while can_peptides:
     can_peptides = Expand(can_peptides)
