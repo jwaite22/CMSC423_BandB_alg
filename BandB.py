@@ -6,7 +6,9 @@ for i in data:
     spectrum.append(int(i))
 spectrum = spectrum[1:]
 
+
 AA_Table =[57,71,87,97,99,101,103,113,114,115,128,129,131,137,147,156,163,186]
+
 
 def can_table(AA_Table,spectrum):
     cans = []
@@ -15,6 +17,7 @@ def can_table(AA_Table,spectrum):
             cans.append([curr])
     return cans
 
+
 def table(AA_Table,spectrum):
     cans = []
     for curr in AA_Table:
@@ -22,9 +25,11 @@ def table(AA_Table,spectrum):
             cans.append(curr)
     return cans
 
+
 can_peptides = can_table(AA_Table, spectrum)
 table = table(AA_Table, spectrum)
 fin_peptides = []
+
 
 def Expand(can_peptides):
     pep = can_peptides[:]
@@ -36,11 +41,36 @@ def Expand(can_peptides):
         pep.remove(i)
     return pep
 
+test = Expand(can_peptides)
+
 def Mass(peptide):
     return sum(peptide)
 
+
+
 def ParentMass(spectrum):
     return spectrum[-1]
+
+
+def lin_spectrum(peptide):
+    final = []
+    plst = peptide
+    if peptide[0] == 0:
+        plst = plst[1:]
+        final.append(0)
+    for i, A in enumerate(peptide):
+        
+        mass = 0
+        
+        for x in range(i, len(plst)):
+            mass += plst[x]
+            print(mass)
+            final.append(mass)
+    final.sort()
+    return final
+
+
+
 
 def consistent(cyclo, spectrum):
     spec = spectrum[:]
@@ -50,27 +80,19 @@ def consistent(cyclo, spectrum):
         spec.remove(curr)
     return True
 
+
 def Cyclospectrum(peptide):
-    cyclo=peptide[:]
-    length = len(peptide)
-    if length > 2:
-        cyclo.append(peptide[0] + peptide[length-1])
-        for i in range(len(peptide)):
-            pep = peptide[i]
-            j= i+1
-            while j < length:
-                pep += peptide[j]
-                cyclo.append(pep)
-                j+=1
-            if i > 0 and i < length-1 and length > 0:
-                cyclo.append(peptide[0] + peptide[length-1]+peptide[i])
-    else:
-        if length == 1:
-            return peptide
-        else :
-            return (peptide + [peptide[1] + peptide[0]])
-    cyclo.sort()
-    return cyclo
+    final = []
+    plst = peptide + peptide
+    for i, A in enumerate(peptide):
+        for j in range(i,i+len(peptide)):
+            mass = 0
+            for x in range(i,j+1):
+                mass += plst[x]
+            final.append(mass)
+    final.sort()
+    final = final[:(-len(peptide)+1)]
+    return final
 
 
 while can_peptides:
@@ -82,9 +104,11 @@ while can_peptides:
             if ( cyc == spectrum and (pep not in fin_peptides)):
                 fin_peptides.append(pep)
             test_peptides.remove(pep)
-        elif not consistent(pep,spectrum): 
+        elif not consistent(lin_spectrum(pep),spectrum): 
             test_peptides.remove(pep)
     can_peptides = test_peptides
+
+
 
 outfile= open("output","w+")
 
